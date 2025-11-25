@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useAppointments } from '@/contexts/AppointmentsContext';
-import { Cita, MOTIVOS_CANCELACION } from '@/types/appointments';
-import { AlertTriangle } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useAppointments } from "@/contexts/AppointmentsContext";
+import { Cita, MOTIVOS_CANCELACION } from "@/types/appointments";
+import { AlertTriangle } from "lucide-react";
+import React, { useState } from "react";
 
 interface CancelAppointmentModalProps {
   cita: Cita;
@@ -15,10 +27,10 @@ interface CancelAppointmentModalProps {
 export const CancelAppointmentModal: React.FC<CancelAppointmentModalProps> = ({
   cita,
   open,
-  onOpenChange
+  onOpenChange,
 }) => {
   const { cancelarCita, isLoading } = useAppointments();
-  const [motivo, setMotivo] = useState<string>('');
+  const [motivo, setMotivo] = useState<string>("");
 
   const handleSubmit = async () => {
     if (!motivo) return;
@@ -27,7 +39,7 @@ export const CancelAppointmentModal: React.FC<CancelAppointmentModalProps> = ({
 
     if (success) {
       onOpenChange(false);
-      setMotivo('');
+      setMotivo("");
     }
   };
 
@@ -40,7 +52,9 @@ export const CancelAppointmentModal: React.FC<CancelAppointmentModalProps> = ({
             <span>Cancelar Cita</span>
           </DialogTitle>
           <DialogDescription>
-            Estás a punto de cancelar esta cita. Esta acción no se puede deshacer. No se puede cancelar con menos de 24 horas de anticipación.
+            Estás a punto de cancelar esta cita. Esta acción no se puede
+            deshacer. No se puede cancelar con menos de 24 horas de
+            anticipación.
           </DialogDescription>
         </DialogHeader>
 
@@ -50,11 +64,11 @@ export const CancelAppointmentModal: React.FC<CancelAppointmentModalProps> = ({
               Motivo de cancelación <span className="text-destructive">*</span>
             </label>
             <Select value={motivo} onValueChange={setMotivo}>
-              <SelectTrigger>
+              <SelectTrigger id="motivo-cancelacion">
                 <SelectValue placeholder="Selecciona un motivo" />
               </SelectTrigger>
               <SelectContent>
-                {MOTIVOS_CANCELACION.map(m => (
+                {MOTIVOS_CANCELACION.map((m) => (
                   <SelectItem key={m} value={m}>
                     {m}
                   </SelectItem>
@@ -77,7 +91,7 @@ export const CancelAppointmentModal: React.FC<CancelAppointmentModalProps> = ({
               disabled={!motivo || isLoading}
               className="flex-1"
             >
-              {isLoading ? 'Cancelando...' : 'Confirmar Cancelación'}
+              {isLoading ? "Cancelando..." : "Confirmar Cancelación"}
             </Button>
           </div>
         </div>

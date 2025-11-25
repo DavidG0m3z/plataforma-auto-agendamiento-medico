@@ -1,45 +1,81 @@
-import React, { useState } from 'react';
-import { Calendar } from '@/components/ui/calendar';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAppointments } from '@/contexts/AppointmentsContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { CalendarIcon, MapPin, Stethoscope, UserCircle, Clock } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useAppointments } from "@/contexts/AppointmentsContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { cn } from "@/lib/utils";
+import {
+  CalendarIcon,
+  Clock,
+  MapPin,
+  Stethoscope,
+  UserCircle,
+} from "lucide-react";
+import React, { useState } from "react";
 
 interface AppointmentCalendarProps {
   onSuccess?: () => void;
 }
 
-export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ onSuccess }) => {
-  const { sedes, especialidades, profesionales, agendarCita, obtenerHorariosDisponibles, isLoading } = useAppointments();
+export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
+  onSuccess,
+}) => {
+  const {
+    sedes,
+    especialidades,
+    profesionales,
+    agendarCita,
+    obtenerHorariosDisponibles,
+    isLoading,
+  } = useAppointments();
   const { user } = useAuth();
-  
-  const [selectedSede, setSelectedSede] = useState<string>('');
-  const [selectedEspecialidad, setSelectedEspecialidad] = useState<string>('');
-  const [selectedProfesional, setSelectedProfesional] = useState<string>('');
+
+  const [selectedSede, setSelectedSede] = useState<string>("");
+  const [selectedEspecialidad, setSelectedEspecialidad] = useState<string>("");
+  const [selectedProfesional, setSelectedProfesional] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<Date>();
-  const [selectedHora, setSelectedHora] = useState<string>('');
+  const [selectedHora, setSelectedHora] = useState<string>("");
 
-  const especialidadesFiltradas = especialidades.filter(e => 
-    !selectedSede || e.sedeIds.includes(selectedSede)
+  const especialidadesFiltradas = especialidades.filter(
+    (e) => !selectedSede || e.sedeIds.includes(selectedSede)
   );
 
-  const profesionalesFiltrados = profesionales.filter(p => 
-    (!selectedSede || p.sedeIds.includes(selectedSede)) &&
-    (!selectedEspecialidad || p.especialidadId === selectedEspecialidad)
+  const profesionalesFiltrados = profesionales.filter(
+    (p) =>
+      (!selectedSede || p.sedeIds.includes(selectedSede)) &&
+      (!selectedEspecialidad || p.especialidadId === selectedEspecialidad)
   );
 
-  const horariosDisponibles = selectedProfesional && selectedDate
-    ? obtenerHorariosDisponibles(
-        selectedProfesional, 
-        selectedDate.toISOString().split('T')[0]
-      )
-    : [];
+  const horariosDisponibles =
+    selectedProfesional && selectedDate
+      ? obtenerHorariosDisponibles(
+          selectedProfesional,
+          selectedDate.toISOString().split("T")[0]
+        )
+      : [];
 
   const handleSubmit = async () => {
-    if (!user || !selectedSede || !selectedEspecialidad || !selectedProfesional || !selectedDate || !selectedHora) {
+    if (
+      !user ||
+      !selectedSede ||
+      !selectedEspecialidad ||
+      !selectedProfesional ||
+      !selectedDate ||
+      !selectedHora
+    ) {
       return;
     }
 
@@ -48,22 +84,27 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ onSucc
       sedeId: selectedSede,
       especialidadId: selectedEspecialidad,
       profesionalId: selectedProfesional,
-      fecha: selectedDate.toISOString().split('T')[0],
-      hora: selectedHora
+      fecha: selectedDate.toISOString().split("T")[0],
+      hora: selectedHora,
     });
 
     if (success) {
       // Reset form
-      setSelectedSede('');
-      setSelectedEspecialidad('');
-      setSelectedProfesional('');
+      setSelectedSede("");
+      setSelectedEspecialidad("");
+      setSelectedProfesional("");
       setSelectedDate(undefined);
-      setSelectedHora('');
+      setSelectedHora("");
       onSuccess?.();
     }
   };
 
-  const isFormComplete = selectedSede && selectedEspecialidad && selectedProfesional && selectedDate && selectedHora;
+  const isFormComplete =
+    selectedSede &&
+    selectedEspecialidad &&
+    selectedProfesional &&
+    selectedDate &&
+    selectedHora;
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
@@ -73,7 +114,9 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ onSucc
             <CalendarIcon className="h-5 w-5 text-primary" />
             <span>Datos de la Cita</span>
           </CardTitle>
-          <CardDescription>Selecciona sede, especialidad y profesional</CardDescription>
+          <CardDescription>
+            Selecciona sede, especialidad y profesional
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -82,11 +125,11 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ onSucc
               <span>Sede</span>
             </label>
             <Select value={selectedSede} onValueChange={setSelectedSede}>
-              <SelectTrigger>
+              <SelectTrigger id="sede">
                 <SelectValue placeholder="Selecciona una sede" />
               </SelectTrigger>
               <SelectContent>
-                {sedes.map(sede => (
+                {sedes.map((sede) => (
                   <SelectItem key={sede.id} value={sede.id}>
                     {sede.nombre}
                   </SelectItem>
@@ -100,16 +143,16 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ onSucc
               <Stethoscope className="h-4 w-4 text-primary" />
               <span>Especialidad</span>
             </label>
-            <Select 
-              value={selectedEspecialidad} 
+            <Select
+              value={selectedEspecialidad}
               onValueChange={setSelectedEspecialidad}
               disabled={!selectedSede}
             >
-              <SelectTrigger>
+              <SelectTrigger id="especialidad">
                 <SelectValue placeholder="Selecciona una especialidad" />
               </SelectTrigger>
               <SelectContent>
-                {especialidadesFiltradas.map(esp => (
+                {especialidadesFiltradas.map((esp) => (
                   <SelectItem key={esp.id} value={esp.id}>
                     {esp.nombre}
                   </SelectItem>
@@ -123,16 +166,16 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ onSucc
               <UserCircle className="h-4 w-4 text-primary" />
               <span>Profesional</span>
             </label>
-            <Select 
-              value={selectedProfesional} 
+            <Select
+              value={selectedProfesional}
               onValueChange={setSelectedProfesional}
               disabled={!selectedEspecialidad}
             >
-              <SelectTrigger>
+              <SelectTrigger id="profesional">
                 <SelectValue placeholder="Selecciona un profesional" />
               </SelectTrigger>
               <SelectContent>
-                {profesionalesFiltrados.map(prof => (
+                {profesionalesFiltrados.map((prof) => (
                   <SelectItem key={prof.id} value={prof.id}>
                     {prof.nombreCompleto}
                   </SelectItem>
@@ -147,7 +190,9 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ onSucc
         <CardHeader>
           <CardTitle>Fecha y Hora</CardTitle>
           <CardDescription>
-            {selectedProfesional ? 'Selecciona fecha y horario disponible' : 'Primero selecciona un profesional'}
+            {selectedProfesional
+              ? "Selecciona fecha y horario disponible"
+              : "Primero selecciona un profesional"}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -166,7 +211,7 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ onSucc
                 <span>Horarios Disponibles</span>
               </label>
               <div className="grid grid-cols-4 gap-2">
-                {horariosDisponibles.map(hora => (
+                {horariosDisponibles.map((hora) => (
                   <Button
                     key={hora}
                     variant={selectedHora === hora ? "default" : "outline"}
@@ -181,18 +226,20 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ onSucc
             </div>
           )}
 
-          {selectedDate && horariosDisponibles.length === 0 && selectedProfesional && (
-            <p className="text-sm text-muted-foreground text-center py-4">
-              No hay horarios disponibles para esta fecha
-            </p>
-          )}
+          {selectedDate &&
+            horariosDisponibles.length === 0 &&
+            selectedProfesional && (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                No hay horarios disponibles para esta fecha
+              </p>
+            )}
 
-          <Button 
-            className="w-full" 
+          <Button
+            className="w-full"
             onClick={handleSubmit}
             disabled={!isFormComplete || isLoading}
           >
-            {isLoading ? 'Agendando...' : 'Confirmar Cita'}
+            {isLoading ? "Agendando..." : "Confirmar Cita"}
           </Button>
         </CardContent>
       </Card>
